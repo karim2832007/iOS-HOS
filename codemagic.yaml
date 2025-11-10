@@ -1,0 +1,24 @@
+﻿workflows:
+  ios-workflow:
+    name: iOS Build
+    environment:
+      vars:
+        XCODE_WORKSPACE: "HoS.xcworkspace"
+        XCODE_SCHEME: "HoS"
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: |
+          gem install cocoapods
+          pod install
+      - name: Build iOS app
+        script: |
+          xcodebuild \
+            -workspace "" \
+            -scheme "" \
+            -sdk iphoneos \
+            -configuration Release \
+            archive \
+            -archivePath /HoS.xcarchive
+    artifacts:
+      - /HoS.xcarchive
