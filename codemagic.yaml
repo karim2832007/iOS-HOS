@@ -3,14 +3,14 @@ workflows:
     name: iOS Unsigned Build
     environment:
       vars:
-        XCODE_WORKSPACE: "HoS.xcworkspace"
+        XCODE_PROJECT: "HoS.xcodeproj"
         XCODE_SCHEME: "HoS"
       xcode: latest
     scripts:
       - name: Build unsigned iOS app
         script: |
           xcodebuild \
-            -workspace "$XCODE_WORKSPACE" \
+            -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -sdk iphoneos \
             -configuration Release \
