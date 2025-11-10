@@ -19,14 +19,15 @@ workflows:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
-      - name: Export unsigned IPA
+
+      - name: Export unsigned IPA (xcodebuild)
         script: |
           cat > ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
-            <key>method</key><string>development</string>
+            <key>method</key><string>debugging</string>
             <key>signingStyle</key><string>manual</string>
             <key>compileBitcode</key><false/>
             <key>thinning</key><string>&lt;none&gt;</string>
@@ -35,11 +36,24 @@ workflows:
           </plist>
           EOF
 
+          # Try exportArchive
           xcodebuild \
             -exportArchive \
             -archivePath $PWD/HoS.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath $PWD/UnsignedIPA
+            -exportPath $PWD/UnsignedIPA || true
+
+      - name: Fallback manual IPA packaging
+        script: |
+          if [ ! -f $PWD/UnsignedIPA/*.ipa ]; then
+            echo "xcodebuild export failed, creating IPA manually..."
+            mkdir -p Payload
+            cp -r $PWD/HoS.xcarchive/Products/Applications/*.app Payload/
+            zip -r HoS.ipa Payload
+            mkdir -p UnsignedIPA
+            mv HoS.ipa UnsignedIPA/
+          fi
+
     artifacts:
       - HoS.xcarchive
       - UnsignedIPA/*.ipa
