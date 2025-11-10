@@ -1,13 +1,13 @@
 ﻿workflows:
-  ios-workflow:
-    name: iOS Build
+  ios-unsigned:
+    name: iOS Unsigned Build
     environment:
       vars:
         XCODE_WORKSPACE: "HoS.xcworkspace"
         XCODE_SCHEME: "HoS"
       xcode: latest
     scripts:
-      - name: Build iOS app
+      - name: Build unsigned iOS app
         script: |
           xcodebuild 
             -workspace "" 
@@ -15,6 +15,7 @@
             -sdk iphoneos 
             -configuration Release 
             archive 
-            -archivePath /HoS.xcarchive
+            -archivePath /HoS.xcarchive 
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
     artifacts:
       - /HoS.xcarchive
